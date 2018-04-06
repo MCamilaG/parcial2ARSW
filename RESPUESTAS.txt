@@ -1,0 +1,22 @@
+﻿
+
+
+* CONDICIÓN DE CARRERA 1:
+
+ pueden haber varios ganadores	REGIÓN CRÍTICA:
+
+	cuando se cargan los articipantes no compiten todos con el mismo numero de competidores ya que pueden cargar en momentos distintos la carrera POSIBLES INCONSISTENCIAS (SI NO SE ELIMINA):
+
+ puede que no se defina nunca el ganador	SOLUCIÓN:
+
+
+ al hacer que se carguen automaticamente al tener 5 participantes se garantiza qu todos compiten con los mismo y solo hay un ganador CONDICIÓN DE CARRERA 2:
+
+ si se registran dos al tiempo pueden haber dos con el mismo numero de id       REGIÓN CRÍTICA:
+
+   cuando se registran los competidores     POSIBLES INCONSISTENCIAS (SI NO SE ELIMINA):
+
+  no se sabe quien gana ya que hay dos competidores con el mismo id por lo que sus datos quedaran inconsistentes      SOLUCIÓN:
+
+
+se verifica que antes de registrar no hyan otros con ese id
