@@ -20,15 +20,24 @@ public class ClickRaceServicesStub implements ClickRaceServices {
 
     //racenum x racersid_set
     ConcurrentHashMap<Integer, Set<RaceParticipant>> racesData=new ConcurrentHashMap<>();
+    private RaceParticipant ganador;
     
     public ClickRaceServicesStub(){
         racesData.put(25, new ConcurrentSkipListSet<>());        
     }
     
+    @Override
+    public void registerWinner(RaceParticipant ganador) throws ServicesException{
+        if(this.ganador!=null){
+             throw new ServicesException("There is a winner");
+        }
+        this.ganador= ganador;       
+    }
 
-//    public RaceParticipant getWinner(){
-//               
-//    }
+    @Override
+    public RaceParticipant getWinner() {
+        return ganador;
+    }
     
     @Override
     public void registerPlayerToRace(int racenum, RaceParticipant rp) throws ServicesException{

@@ -21,9 +21,16 @@ var model = {
     movex: function () {
         model.mycarxpos += 10;
         model.paintCars();
-        if (module.stompClient != null)
+        if (module.stompClient != null) {
+            console.log('moving car')
             module.stompClient.send("/topic/car" + model.mycar.number, {}, JSON.stringify({car: model.mycar.number, xpos: model.mycarxpos}));
+            if (model.mycarxpos >= 640) {
+                console.log('moving car')
+                module.registerWinner(model.mycar.number)
+            }
+        }
     },
+
     paintCars: function () {
         canvas = document.getElementById("cnv");
         ctx = canvas.getContext('2d');
@@ -60,6 +67,18 @@ var module = {
         module.loadCompetitorsFromServer();
     },
 
+    registerWinner: function (number) {
+        axios.post('races/25/winner', {number})
+                .then(function (response) {
+                    model.loadedCars.forEach(car => {
+                        module.stompClient.send("/topic/car" + car.number, {}, JSON.stringify({mensaje: model.mycar.number}));
+                    });
+                }).catch(function (error) {
+            alert("error:" + error);
+
+        })
+    },
+
     initAndRegisterInServer: function () {
         model.mycar = {number: document.getElementById("playerid").value};
         model.mycarxpos = 10;
@@ -87,7 +106,6 @@ var module = {
         } else {
             axios.get("races/25/participants")
                     .then(function (response) {
-//                        if (model.loadedCars.length > 5) {
                         model.loadedCars = response.data;
                         var carCount = 1;
                         alert("Competitors loaded!");
@@ -101,10 +119,7 @@ var module = {
                                 }
                         );
                         model.paintCars();
-                        if (model.loadedCars.length === 3) {
-                            module.connectAndSubscribeToCompetitors();
-                        }
-//                    }
+                        module.connectAndSubscribeToCompetitors();
                     }
                     );
         }
@@ -112,7 +127,8 @@ var module = {
 
     },
     connectAndSubscribeToCompetitors: function () {
-
+        var socket = new SockJS('/stompendpoint');
+        module.stompClient = Stomp.over(socket);
         module.stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
 
@@ -122,8 +138,14 @@ var module = {
                         if (car.number != model.mycar.number) {
                             module.stompClient.subscribe('/topic/car' + car.number, function (data) {
                                 msgdata = JSON.parse(data.body);
-                                model.carsCurrentXPositions[msgdata.car] = msgdata.xpos;
-                                model.paintCars();
+                                if (msgdata.car && msgdata.xpos) {
+                                    model.carsCurrentXPositions[msgdata.car] = msgdata.xpos;
+                                    model.paintCars();
+                                } else if (msgdata.mensaje) {
+                                    alert(`Hay un ganadaor y es: ${msgdata.mensaje}`)
+                                    $('#winner').append(msgdata.mensaje)
+                                }
+
                             });
                         }
                     }
