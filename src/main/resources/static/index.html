@@ -18,7 +18,7 @@ and open the template in the editor.
 
     <script src="app.js"></script>
 </head>
-<body onload="module.deshabilitado()">
+<body >
 
 
 <div class="row">
@@ -30,16 +30,16 @@ and open the template in the editor.
             Race number:<input id="racenum" type="number" value="25"/>
         </div>
         Racer id:<input id="playerid" type="number"/>
-        <button  onclick="module.initAndRegisterInServer()" >Register for a race</button>
+        <button id="register" onclick="module.initAndRegisterInServer()" >Register for a race</button>
 
 
 
-        <button  onclick="module.loadCompetitorsFromServer()" >Load competitors</button>
+        <button  onclick="module.loadCompetitorsFromServer()" style="display: none" >Load competitors</button>
 
 
     </div>
     <div class="col-md-4">
-        <button id="movebutton" class="controls" onclick="model.movex()" >MOVE MY CAR!</button>
+        <button id="movebutton" class="controls" onclick="model.movex()" disabled >MOVE MY CAR!</button>
     </div>
     <div class="col-md-4">
         Winner: <div id="winner"></div>

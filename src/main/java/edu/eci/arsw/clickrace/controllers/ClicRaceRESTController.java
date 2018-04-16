@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +30,6 @@ public class ClicRaceRESTController {
 
     @Autowired
     ClickRaceServices services;
-    
     
     
     @RequestMapping(path = "/{racenum}/participants",method = RequestMethod.GET)
@@ -53,7 +51,7 @@ public class ClicRaceRESTController {
     public ResponseEntity<?> addParticipantNum(@PathVariable(name = "racenum") String racenum,@RequestBody RaceParticipant rp) {
         try {
             services.registerPlayerToRace(Integer.parseInt(racenum), rp);
-                    return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(services.getRegisteredPlayers(Integer.parseInt(racenum)),HttpStatus.CREATED);
         } catch (ServicesException ex) {
             Logger.getLogger(ClicRaceRESTController.class.getName()).log(Level.SEVERE, null, ex);
             return new ResponseEntity<>(ex.getLocalizedMessage(),HttpStatus.BAD_REQUEST);

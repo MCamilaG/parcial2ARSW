@@ -12,8 +12,8 @@ var model = {
     winner: function () {
         model.loadedCars.forEach(
                 function (car) {
-                    if (model.carsCurrentXPositions[car.number]>640 | model.carsCurrentXPositions[car.number]==640 ){
-                        model.winner=model.loadedCars[car.number]
+                    if (model.carsCurrentXPositions[car.number] > 640 | model.carsCurrentXPositions[car.number] == 640) {
+                        model.winner = model.loadedCars[car.number]
                     }
                 }
         );
@@ -59,6 +59,7 @@ var module = {
         $('#movebutton').attr("disabled", true);
         module.loadCompetitorsFromServer();
     },
+
     initAndRegisterInServer: function () {
         model.mycar = {number: document.getElementById("playerid").value};
         model.mycarxpos = 10;
@@ -67,34 +68,43 @@ var module = {
         axios.put('races/25/participants', model.mycar)
                 .then(function (response) {
                     alert("Competitor registered successfully!");
-                    model.paintCars();
+                    if (response.data.length === 5) {
+                        module.loadCompetitorsFromServer();
+                        $('#movebutton').attr("disabled", false);
+                    } else {
+                        model.paintCars();
+                    }
+
+                    $('#register').attr('disabled', true);
                 })
                 .catch(function (error) {
                     alert("error:" + error);
                 });
     },
     loadCompetitorsFromServer: function () {
-        if (model.mycar == undefined) {
+        if (model.mycar === undefined) {
             alert('Register your car first!');
         } else {
             axios.get("races/25/participants")
                     .then(function (response) {
-                        if (model.loadedCars.length > 5) {
-                            model.loadedCars = response.data;
-                            var carCount = 1;
-                            alert("Competitors loaded!");
-                            model.loadedCars.forEach(
-                                    function (car) {
-                                        if (car.number != model.mycar.number) {
-                                            model.carsCurrentXPositions[car.number] = 10;
-                                            model.carsCurrentYPositions[car.number] = 40 * carCount;
-                                            carCount++;
-                                        }
+//                        if (model.loadedCars.length > 5) {
+                        model.loadedCars = response.data;
+                        var carCount = 1;
+                        alert("Competitors loaded!");
+                        model.loadedCars.forEach(
+                                function (car) {
+                                    if (car.number != model.mycar.number) {
+                                        model.carsCurrentXPositions[car.number] = 10;
+                                        model.carsCurrentYPositions[car.number] = 40 * carCount;
+                                        carCount++;
                                     }
-                            );
-                            model.paintCars();
+                                }
+                        );
+                        model.paintCars();
+                        if (model.loadedCars.length === 3) {
                             module.connectAndSubscribeToCompetitors();
                         }
+//                    }
                     }
                     );
         }
@@ -102,8 +112,7 @@ var module = {
 
     },
     connectAndSubscribeToCompetitors: function () {
-        var socket = new SockJS('/stompendpoint');
-        module.stompClient = Stomp.over(socket);
+
         module.stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
 
@@ -127,6 +136,9 @@ var module = {
         }
         setConnected(false);
         console.log("Disconnected");
+    },
+    sendMessage: () => {
+        module.stompClient.send("/topic/loadCompetitors", {}, {message: 'hola'})
     }
 }
 
